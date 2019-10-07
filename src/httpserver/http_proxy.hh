@@ -4,10 +4,17 @@
 #define HTTP_PROXY_HH
 
 #include <string>
+#include <unordered_map>
+#include <chrono>
+#include <ctime>
+#include <ratio>
 
 #include "socket.hh"
 #include "secure_socket.hh"
 #include "http_response.hh"
+
+using namespace std;
+using namespace std::chrono;
 
 class HTTPBackingStore;
 class EventLoop;
@@ -19,6 +26,7 @@ class HTTPProxy
 {
 private:
     TCPSocket listener_socket_;
+    unordered_map<string, vector<float>> um;
 
     template <class SocketType>
     void loop( SocketType & server, SocketType & client, HTTPBackingStore & backing_store );
@@ -36,6 +44,7 @@ public:
        the given event_loop, saving request-response pairs to the given
        backing_store (which is captured and must continue to persist) */
     void register_handlers( EventLoop & event_loop, HTTPBackingStore & backing_store );
+    void print_map(string directory);
 };
 
 #endif /* HTTP_PROXY_HH */

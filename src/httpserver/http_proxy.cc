@@ -3,6 +3,9 @@
 #include <thread>
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <vector>                                                               
+#include <numeric> 
 #include <arpa/inet.h>
 #include <linux/netfilter_ipv4.h>
 
@@ -21,13 +24,16 @@
 #include "backing_store.hh"
 #include "exception.hh"
 
-using namespace std;
+
 using namespace PollerShortNames;
+using namespace std;
+using namespace std::chrono;
 
 HTTPProxy::HTTPProxy( const Address & listener_addr )
     : listener_socket_(),
+      um(),
       server_context_( SERVER ),
-      client_context_( CLIENT )
+      client_context_( CLIENT )      
 {
     listener_socket_.bind( listener_addr );
     listener_socket_.listen();
@@ -89,6 +95,19 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
     }
 }
 
+void HTTPProxy::print_map(string directory)
+{
+    ofstream file(directory + "/rtt.txt");
+    if(file.is_open()){
+        for( auto i = um.begin(); i!= um.end(); i++){                    
+            float average = std::accumulate( i->second.begin(), i->second.end(), 0.0)/i->second.size(); 
+            file << i->first.substr(0, i->first.find_first_of(':')) << "\t" << i->first.substr(i->first.find_first_of(':')+1) << "\t" << average;
+            file << endl;
+        }
+        file.close();
+    }
+}
+
 void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
 {
     thread newthread( [&] ( TCPSocket client ) {
@@ -98,8 +117,20 @@ void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
 
                 /* create socket and connect to original destination and send original request */
                 TCPSocket server;
+                auto t1 = high_resolution_clock::now();
                 server.connect( server_addr );
+                auto t2 = high_resolution_clock::now();
+                float value = (t2 - t1)/std::chrono::milliseconds(1);
+                // duration<double> time_span = duration_cast<duration<double>>(t2-t1);
 
+                std::unordered_map<std::string, vector<float>>::const_iterator got = um.find(server_addr.str());
+
+                if (got == um.end()){
+                    vector<float> var;
+                    um[server_addr.str()] = var;//vector<double>();
+                }
+                um.at(server_addr.str()).push_back(value);
+                // print_map();
                 if ( server_addr.port() != 443 ) { /* normal HTTP */
                     return loop( server, client, backing_store );
                 }
