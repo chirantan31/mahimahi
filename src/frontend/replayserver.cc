@@ -121,16 +121,18 @@ int main( void )
         MahimahiProtobufs::RequestResponse best_match;
 
         for ( const auto & filename : files ) {
-            FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
-            MahimahiProtobufs::RequestResponse current_record;
-            if ( not current_record.ParseFromFileDescriptor( fd.fd_num() ) ) {
-                throw runtime_error( filename + ": invalid HTTP request/response" );
-            }
+            if (filename.find("rtt.txt") == string::npos) { // ignore the rtt.txt file
+                FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
+                MahimahiProtobufs::RequestResponse current_record;
+                if ( not current_record.ParseFromFileDescriptor( fd.fd_num() ) ) {
+                    throw runtime_error( filename + ": invalid HTTP request/response" );
+                }
 
-            unsigned int score = match_score( current_record, request_line, is_https );
-            if ( score > best_score ) {
-                best_match = current_record;
-                best_score = score;
+                unsigned int score = match_score( current_record, request_line, is_https );
+                if ( score > best_score ) {
+                    best_match = current_record;
+                    best_score = score;
+                }
             }
         }
 
