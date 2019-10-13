@@ -46,6 +46,14 @@ libmod_deepcgi_la_SOURCES = mod_deepcgi.c replayserver_filename.cc
 libmod_deepcgi_la_CFLAGS = -I@APACHE2_INCLUDE@ $(libapr1_CFLAGS)
 libmod_deepcgi_la_CPPFLAGS = # empty
 
+
+bin_PROGRAMS += mm-adv-delay
+mm_adv_delay_SOURCES = advdelayshell.cc adv_delay_queue.hh adv_delay_queue.cc delay_rule.hh delay_rule.cc
+mm_adv_delay_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a
+mm_adv_delay_LDFLAGS = -pthread
+
+
+
 install-exec-hook:
 	chown root $(DESTDIR)$(bindir)/mm-delay
 	chmod u+s $(DESTDIR)$(bindir)/mm-delay
@@ -61,3 +69,5 @@ install-exec-hook:
 	chmod u+s $(DESTDIR)$(bindir)/mm-webrecord
 	chown root $(DESTDIR)$(bindir)/mm-webreplay
 	chmod u+s $(DESTDIR)$(bindir)/mm-webreplay
+	chown root $(DESTDIR)$(bindir)/mm-adv-delay
+	chmod u+s $(DESTDIR)$(bindir)/mm-adv-delay
