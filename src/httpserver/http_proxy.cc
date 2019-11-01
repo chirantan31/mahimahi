@@ -32,7 +32,6 @@ using namespace std::chrono;
 
 HTTPProxy::HTTPProxy( const Address & listener_addr )
     : listener_socket_(),
-      um(),
       server_context_( SERVER ),
       client_context_( CLIENT )      
 {
@@ -95,19 +94,6 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
         if ( poller.poll( -1 ).result == Poller::Result::Type::Exit ) {
             return;
         }
-    }
-}
-
-void HTTPProxy::print_map(string directory)
-{
-    ofstream file(directory + "/rtt.txt");
-    if(file.is_open()){
-        for( auto i = um.begin(); i!= um.end(); i++){                    
-            float average = std::accumulate( i->second.begin(), i->second.end(), 0.0)/i->second.size(); 
-            file << i->first.substr(0, i->first.find_first_of(':')) << "\t" << i->first.substr(i->first.find_first_of(':')+1) << "\t" << average;
-            file << endl;
-        }
-        file.close();
     }
 }
 

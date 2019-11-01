@@ -26,7 +26,6 @@ class HTTPProxy
 {
 private:
     TCPSocket listener_socket_;
-    unordered_map<string, vector<float>> um;
 
     template <class SocketType>
     void loop( SocketType & server, SocketType & client, HTTPBackingStore & backing_store );
@@ -44,7 +43,6 @@ public:
        the given event_loop, saving request-response pairs to the given
        backing_store (which is captured and must continue to persist) */
     void register_handlers( EventLoop & event_loop, HTTPBackingStore & backing_store );
-    void print_map(string directory);
 };
 
 #endif /* HTTP_PROXY_HH */
