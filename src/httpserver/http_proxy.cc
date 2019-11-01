@@ -23,6 +23,7 @@
 #include "secure_socket.hh"
 #include "backing_store.hh"
 #include "exception.hh"
+#include "timelogger.hh"
 
 
 using namespace PollerShortNames;
@@ -83,6 +84,8 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
                                        [&] () {
                                            client.write( response_parser.front().str() );
                                            backing_store.save( response_parser.front(), server_addr );
+                                           TimeLogger::end(server_addr.str(), response_parser.front().request().str());
+                                           TimeLogger::printFinals();
                                            response_parser.pop();
                                            return ResultType::Continue;
                                        },
@@ -117,19 +120,8 @@ void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
 
                 /* create socket and connect to original destination and send original request */
                 TCPSocket server;
-                auto t1 = high_resolution_clock::now();
+                TimeLogger::start(server_addr.str());
                 server.connect( server_addr );
-                auto t2 = high_resolution_clock::now();
-                float value = (t2 - t1)/std::chrono::milliseconds(1);
-                // duration<double> time_span = duration_cast<duration<double>>(t2-t1);
-
-                std::unordered_map<std::string, vector<float>>::const_iterator got = um.find(server_addr.str());
-
-                if (got == um.end()){
-                    vector<float> var;
-                    um[server_addr.str()] = var;//vector<double>();
-                }
-                um.at(server_addr.str()).push_back(value);
                 // print_map();
                 if ( server_addr.port() != 443 ) { /* normal HTTP */
                     return loop( server, client, backing_store );

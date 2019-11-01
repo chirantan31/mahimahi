@@ -156,9 +156,7 @@ int main( int argc, char *argv[] )
                 EventLoop recordr_event_loop;
                 dns_outside.register_handlers( recordr_event_loop );
                 http_proxy.register_handlers( recordr_event_loop, disk_backing_store );
-                auto x = recordr_event_loop.loop();
-                http_proxy.print_map(directory);
-                return x;
+                return recordr_event_loop.loop();
             } );
         return outer_event_loop.loop();  
     } catch ( const exception & e ) {
