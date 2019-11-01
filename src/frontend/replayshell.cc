@@ -96,20 +96,22 @@ int main( int argc, char *argv[] )
             const vector< string > files = list_directory_contents( directory  );
 
             for ( const auto filename : files ) {
-                FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
+                if (filename.find("rtt.txt") == string::npos) { // ignore the rtt.txt file
+                    FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
 
-                MahimahiProtobufs::RequestResponse protobuf;
-                if ( not protobuf.ParseFromFileDescriptor( fd.fd_num() ) ) {
-                    throw runtime_error( filename + ": invalid HTTP request/response" );
+                    MahimahiProtobufs::RequestResponse protobuf;
+                    if ( not protobuf.ParseFromFileDescriptor( fd.fd_num() ) ) {
+                        throw runtime_error( filename + ": invalid HTTP request/response" );
+                    }
+
+                    const Address address( protobuf.ip(), protobuf.port() );
+
+                    unique_ip.emplace( address.ip(), 0 );
+                    unique_ip_and_port.emplace( address );
+
+                    hostname_to_ip.emplace_back( HTTPRequest( protobuf.request() ).get_header_value( "Host" ),
+                                                 address );
                 }
-
-                const Address address( protobuf.ip(), protobuf.port() );
-
-                unique_ip.emplace( address.ip(), 0 );
-                unique_ip_and_port.emplace( address );
-
-                hostname_to_ip.emplace_back( HTTPRequest( protobuf.request() ).get_header_value( "Host" ),
-                                             address );
             }
         }
 
