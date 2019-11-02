@@ -24,7 +24,7 @@ const opts = {
 
     nav: {
         // Maximum time to complete page navigation.
-        timeout: 30000,
+        timeout: 1000000,
     },
 
     // Event types to observe.

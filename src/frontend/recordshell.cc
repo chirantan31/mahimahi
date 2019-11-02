@@ -10,6 +10,7 @@
 #include "address.hh"
 #include "dns_proxy.hh"
 #include "http_proxy.hh"
+#include "timelogger.hh"
 #include "netdevice.hh"
 #include "event_loop.hh"
 #include "socketpair.hh"
@@ -156,7 +157,10 @@ int main( int argc, char *argv[] )
                 EventLoop recordr_event_loop;
                 dns_outside.register_handlers( recordr_event_loop );
                 http_proxy.register_handlers( recordr_event_loop, disk_backing_store );
-                return recordr_event_loop.loop();
+                auto x = recordr_event_loop.loop();
+                TimeLogger::print_map(directory);
+                TimeLogger::save_rtt(directory);
+                return x;
             } );
         return outer_event_loop.loop();  
     } catch ( const exception & e ) {

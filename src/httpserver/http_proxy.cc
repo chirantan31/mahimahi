@@ -71,7 +71,8 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
     /* completed requests from client are serialized and sent to server */
     poller.add_action( Poller::Action( server, Direction::Out,
                                        [&] () {
-                                           server.write( request_parser.front().str() );
+                                           TimeLogger::startObjLoadTimer(request_parser.front().str());
+                                           server.write( request_parser.front().str() );                                           
                                            response_parser.new_request_arrived( request_parser.front() );
                                            request_parser.pop();
                                            return ResultType::Continue;
@@ -81,10 +82,10 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
     /* completed responses from server are serialized and sent to client */
     poller.add_action( Poller::Action( client, Direction::Out,
                                        [&] () {
+                                           TimeLogger::stopObjLoadTimer(response_parser.front().request().str());
                                            client.write( response_parser.front().str() );
-                                           backing_store.save( response_parser.front(), server_addr );
-                                           TimeLogger::end(server_addr.str(), response_parser.front().request().str());
-                                           TimeLogger::printFinals();
+                                           backing_store.save( response_parser.front(), server_addr );                                           
+                                           // TimeLogger::printFinals();
                                            response_parser.pop();
                                            return ResultType::Continue;
                                        },
@@ -106,8 +107,9 @@ void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
 
                 /* create socket and connect to original destination and send original request */
                 TCPSocket server;
-                TimeLogger::start(server_addr.str());
+                TimeLogger::startRttTimer(server_addr.str());
                 server.connect( server_addr );
+                TimeLogger::stopRttTimer(server_addr.str());
                 // print_map();
                 if ( server_addr.port() != 443 ) { /* normal HTTP */
                     return loop( server, client, backing_store );

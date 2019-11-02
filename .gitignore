@@ -39,3 +39,5 @@ Makefile.in
 /src/frontend/mm-webreplay
 /src/frontend/mm-replayserver
 /src/frontend/.libs
+/web-scripts/node_modules/
+web-scripts/sample/
