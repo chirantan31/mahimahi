@@ -33,14 +33,14 @@ using namespace std::chrono;
 HTTPProxy::HTTPProxy( const Address & listener_addr )
     : listener_socket_(),
       server_context_( SERVER ),
-      client_context_( CLIENT )      
+      client_context_( CLIENT )     
 {
     listener_socket_.bind( listener_addr );
     listener_socket_.listen();
 }
 
 template <class SocketType>
-void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore & backing_store )
+void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore * backing_store )
 {
     Poller poller;
 
@@ -84,7 +84,9 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
                                        [&] () {
                                            TimeLogger::stopObjLoadTimer(response_parser.front().request().str());
                                            client.write( response_parser.front().str() );
-                                           backing_store.save( response_parser.front(), server_addr );                                           
+                                           if (backing_store) {
+                                              backing_store->save( response_parser.front(), server_addr );                                           
+                                           }
                                            // TimeLogger::printFinals();
                                            response_parser.pop();
                                            return ResultType::Continue;
@@ -98,10 +100,11 @@ void HTTPProxy::loop( SocketType & server, SocketType & client, HTTPBackingStore
     }
 }
 
-void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
+void HTTPProxy::handle_tcp( HTTPBackingStore * backing_store )
 {
     thread newthread( [&] ( TCPSocket client ) {
             try {
+                cout << "Accept new tcp connection" << endl;
                 /* get original destination for connection request */
                 Address server_addr = client.original_dest();
 
@@ -122,6 +125,8 @@ void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
                 SecureSocket tls_client( server_context_.new_secure_socket( move( client ) ) );
                 tls_client.accept();
 
+                cout << "Starting the loop" << endl;
+
                 loop( tls_server, tls_client, backing_store );
             } catch ( const exception & e ) {
                 print_exception( e );
@@ -135,7 +140,7 @@ void HTTPProxy::handle_tcp( HTTPBackingStore & backing_store )
 /* register this HTTPProxy's TCP listener socket to handle events with
    the given event_loop, saving request-response pairs to the given
    backing_store (which is captured and must continue to persist) */
-void HTTPProxy::register_handlers( EventLoop & event_loop, HTTPBackingStore & backing_store )
+void HTTPProxy::register_handlers( EventLoop & event_loop, HTTPBackingStore * backing_store )
 {
     event_loop.add_simple_input_handler( tcp_listener(),
                                          [&] () {

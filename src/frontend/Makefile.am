@@ -52,6 +52,10 @@ mm_adv_delay_SOURCES = advdelayshell.cc adv_delay_queue.hh adv_delay_queue.cc de
 mm_adv_delay_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a
 mm_adv_delay_LDFLAGS = -pthread
 
+bin_PROGRAMS += mm-proxy
+mm_proxy_SOURCES = proxyshell.cc
+mm_proxy_LDADD = -lrt ../httpserver/libhttpserver.a ../http/libhttp.a ../protobufs/libhttprecordprotos.a ../util/libutil.a $(protobuf_LIBS) $(libcrypto_LIBS) $(libssl_LIBS)
+mm_proxy_LDFLAGS = -pthread
 
 
 install-exec-hook:
@@ -71,3 +75,5 @@ install-exec-hook:
 	chmod u+s $(DESTDIR)$(bindir)/mm-webreplay
 	chown root $(DESTDIR)$(bindir)/mm-adv-delay
 	chmod u+s $(DESTDIR)$(bindir)/mm-adv-delay
+	chown root $(DESTDIR)$(bindir)/mm-proxy
+	chmod u+s $(DESTDIR)$(bindir)/mm-proxy
