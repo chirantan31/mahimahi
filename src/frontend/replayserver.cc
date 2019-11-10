@@ -121,7 +121,7 @@ int main( void )
         MahimahiProtobufs::RequestResponse best_match;
 
         for ( const auto & filename : files ) {
-            if (filename.find("rtts.txt") == string::npos || filename.find("request_delays.txt") == string::npos ) { // ignore the rtt.txt file
+            if (filename.find("save") != string::npos) { // Only load files that include "save"
                 FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
                 MahimahiProtobufs::RequestResponse current_record;
                 if ( not current_record.ParseFromFileDescriptor( fd.fd_num() ) ) {
