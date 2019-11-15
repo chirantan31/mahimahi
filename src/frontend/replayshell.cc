@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
             const vector< string > files = list_directory_contents( directory  );
 
             for ( const auto filename : files ) {
-                if (filename.find("save") != string::npos) { // Only load files that include "save"
+                if ( filename.find("save") != string::npos ) { // Only load the recorded save files
                     FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
 
                     MahimahiProtobufs::RequestResponse protobuf;
@@ -155,7 +155,7 @@ int main( int argc, char *argv[] )
 
                 /* restore environment and tweak bash prompt */
                 environ = user_environment;
-                prepend_shell_prefix( "[test-replay] " );
+                prepend_shell_prefix( "[replay] " );
 
                 return ezexec( command, true );
         } );

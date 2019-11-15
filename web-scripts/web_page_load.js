@@ -49,7 +49,7 @@ const opts = {
 
 (() => {
     // Sleep for 2 second before launching the browser so that mahi2 has finished setup properly.
-    // sleep.sleep(2);
+    sleep.sleep(2);
     const EXIT_FAIL = 1;
 
     function showUsage(err) {

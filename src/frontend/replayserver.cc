@@ -121,7 +121,7 @@ int main( void )
         MahimahiProtobufs::RequestResponse best_match;
 
         for ( const auto & filename : files ) {
-            if (filename.find("save") != string::npos) { // Only load files that include "save"
+            if (filename.find("save") != string::npos) { // Only load the recorded save files
                 FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
                 MahimahiProtobufs::RequestResponse current_record;
                 if ( not current_record.ParseFromFileDescriptor( fd.fd_num() ) ) {

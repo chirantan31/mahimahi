@@ -52,18 +52,26 @@ def main(args):
 	    		packet_rule_fpath = output_folder + "packet_rule"
 		    	os.mkdir(output_folder)
 		    	os.mkdir(traffic_folder)
-		    	# Generate delay rule file
-		    	gen_rule = ["python", GEN_PACKET_RULE_SCRIPT, url, record_folder, REPLAY_CONFIG, packet_rule_fpath]
-		    	subprocess.call(gen_rule)
+		    	# # Generate delay rule file
+		    	# gen_rule = ["python", GEN_PACKET_RULE_SCRIPT, url, record_folder, REPLAY_CONFIG, packet_rule_fpath]
+		    	# subprocess.call(gen_rule)
 		    	har_file = output_folder + domain + ".har"
 		    	stdout_file_path = output_folder + "mahimahi-stdout"
 		    	stdout_file = open(stdout_file_path, "w")
+		    	# # Call mahimahi and script to launch chrome
+		    	# mahimahi_replay = ["mm-webreplay", record_data_folder]
+		    	# mahimahi_delay = ["mm-adv-delay", DEFAULT_DELAY, packet_rule_fpath, traffic_fpath]
+		    	# # mahimahi_proxy = ["mm-proxy", output_folder]
+		    	# web_page_load = ["nodejs", WEB_PAGE_LOAD_SCRIPT, url, har_file, BROWSER_WAIT_MARK]
+		    	# # commands = mahimahi_replay + mahimahi_delay + mahimahi_proxy + web_page_load
+		    	# commands = mahimahi_replay + mahimahi_delay + web_page_load
+
 		    	# Call mahimahi and script to launch chrome
 		    	mahimahi_replay = ["mm-webreplay", record_data_folder]
-		    	mahimahi_delay = ["mm-adv-delay", DEFAULT_DELAY, packet_rule_fpath, traffic_fpath]
-		    	mahimahi_proxy = ["mm-proxy", output_folder]
 		    	web_page_load = ["nodejs", WEB_PAGE_LOAD_SCRIPT, url, har_file, BROWSER_WAIT_MARK]
-		    	commands = mahimahi_replay + mahimahi_delay + mahimahi_proxy + web_page_load
+		    	# commands = mahimahi_replay + mahimahi_delay + mahimahi_proxy + web_page_load
+		    	commands = mahimahi_replay + web_page_load
+
 		    	subprocess.call(commands, stdout=stdout_file)
 		    	stdout_file.close()
 		    	# Check whether recording success by finding the har file

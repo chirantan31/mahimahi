@@ -1,0 +1,15 @@
+GET	/images/searchbox/desktop_searchbox_sprites302_hr.webp	-1
+GET	/images/nav_logo299.webp	0
+GET	/?gws_rd=ssl	129
+GET	/	28
+GET	/logos/doodles/2019/celebrating-the-edmonton-grads-5689265269768192-l.png	-5
+GET	/tbproxy/af/query?q=Chc2LjEuMTcxNS4xNDQyL2VuIChHR0xMKRMZ9dVUO7IApPEjLWlIR0dCA2NzaUoIdGV4dGFyZWEkFA==	-11
+GET	/_/scs/abc-static/_/js/k=gapi.gapi.en.7kWSr24wXFc.O/m=gapi_iframes,googleapis_client,plusone/rt=j/sv=1/d=1/ed=1/rs=AHpOoo-i9r7IbCTUQfJ0v-FPhRKRS8aihQ/cb=gapi.loaded_0	-12
+GET	/xjs/_/js/k=xjs.s.en_US.WI07Na-VA8c.O/ck=xjs.s.aiQg-4zPUdk.L.W.O/m=Fkg7bd,HcFEGb,IvlUe,MC8mtf,OF7gzc,RMhBfe,T4BAC,TJw5qb,TbaHGc,Y33vzc,cdos,hsm,iDPoPb,jsa,mvYTse,tg8oTe,uz938c,vWNDde,ws9Tlc,yQ43ff,d,csi/am=AAAAsATsugOC_L8VAAQAdgwAAALcgg0WCENChbE6kQgg/d=1/dg=2/br=1/ct=zgms/rs=ACT90oFPrDoLF6XynRc3Oii0YFzClUFeuw	-19
+GET	/og/_/js/k=og.og2.en_US.Rd6YRbM42SU.O/rt=j/m=def,aswid/exm=in,fot/d=1/ed=1/rs=AA2YrTvNa6YiJdkz2GnJIWeQRq8mtZfwfQ	-10
+GET	/gb/images/i1_1967ca6a.png	-5
+POST	/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard	8
+POST	/gen_204?s=webhp&t=aft&atyp=csi&ei=h4vHXdbRJYXCsQXq_ZLIBg&rt=wsrt.99,aft.199,prt.238&bl=HtyJ&ima=2&imad=0&imn=2	0
+GET	/favicon.ico	-5
+POST	/gen_204?atyp=csi&ei=h4vHXdbRJYXCsQXq_ZLIBg&s=webhp&t=all&bl=HtyJ&imn=2&adh=&conn=onchange&ima=2&imad=0&ime=2&imeb=0&imeo=0&wh=585&scp=0&net=dl.1550,ect.4g,rtt.100&mem=ujhs.10,tjhs.10,jhsl.2190,dm.4&sto=&sys=hc.4&rt=aft.199,iml.199,prt.238,dcl.248,xjsls.262,xjses.464,xjsee.508,xjs.508,ol.667,wsrt.99,cst.33,dnst.0,rqst.33,rspt.2,sslt.33,rqstt.68,unt.32,cstt.35,dit.346&zx=1573374836363	0
+GET	/xjs/_/js/k=xjs.s.en_US.WI07Na-VA8c.O/ck=xjs.s.aiQg-4zPUdk.L.W.O/am=AAAAsATsugOC_L8VAAQAdgwAAALcgg0WCENChbE6kQgg/d=1/exm=Fkg7bd,HcFEGb,IvlUe,MC8mtf,OF7gzc,RMhBfe,T4BAC,TJw5qb,TbaHGc,Y33vzc,cdos,csi,d,hsm,iDPoPb,jsa,mvYTse,tg8oTe,uz938c,vWNDde,ws9Tlc,yQ43ff/ed=1/dg=2/br=1/ct=zgms/rs=ACT90oFPrDoLF6XynRc3Oii0YFzClUFeuw/m=aa,abd,async,dvl,fEVMic,foot,ifl,lu,m,mUpTid,mu,sb_wiz,sf,sonic,spch,wft,xz7cCd?xjs=s1	-1

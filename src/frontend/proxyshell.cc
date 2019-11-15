@@ -147,7 +147,7 @@ int main( int argc, char *argv[] )
 
                 EventLoop proxy_event_loop;
                 dns_outside.register_handlers( proxy_event_loop );
-                http_proxy.register_handlers( proxy_event_loop, NULL );
+                http_proxy.register_handlers( proxy_event_loop );
                 auto x = proxy_event_loop.loop();
                 TimeLogger::print_map(directory);
                 return x;
