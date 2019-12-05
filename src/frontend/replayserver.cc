@@ -8,6 +8,10 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <fstream>
+#include <chrono>
+#include <thread>
+#include <sstream>
 
 #include "util.hh"
 #include "http_record.pb.h"
@@ -18,6 +22,9 @@
 #include "file_descriptor.hh"
 
 using namespace std;
+
+/* GLOBAL VAR */
+ofstream mylog;
 
 string safe_getenv( const string & key )
 {
@@ -121,7 +128,7 @@ int main( void )
         MahimahiProtobufs::RequestResponse best_match;
 
         for ( const auto & filename : files ) {
-            if (filename.find("rtt.txt") == string::npos) { // ignore the rtt.txt file
+            if (filename.find("save") != string::npos) { // Only load the recorded save files
                 FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
                 MahimahiProtobufs::RequestResponse current_record;
                 if ( not current_record.ParseFromFileDescriptor( fd.fd_num() ) ) {

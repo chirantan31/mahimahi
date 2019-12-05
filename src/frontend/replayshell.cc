@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
             const vector< string > files = list_directory_contents( directory  );
 
             for ( const auto filename : files ) {
-                if (filename.find("rtt.txt") == string::npos) { // ignore the rtt.txt file
+                if ( filename.find("save") != string::npos ) { // Only load the recorded save files
                     FileDescriptor fd( SystemCall( "open", open( filename.c_str(), O_RDONLY ) ) );
 
                     MahimahiProtobufs::RequestResponse protobuf;

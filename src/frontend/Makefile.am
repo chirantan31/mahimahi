@@ -52,7 +52,15 @@ mm_adv_delay_SOURCES = advdelayshell.cc adv_delay_queue.hh adv_delay_queue.cc de
 mm_adv_delay_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a
 mm_adv_delay_LDFLAGS = -pthread
 
+bin_PROGRAMS += mm-proxy
+mm_proxy_SOURCES = proxyshell.cc
+mm_proxy_LDADD = -lrt ../httpserver/libhttpserver.a ../http/libhttp.a ../protobufs/libhttprecordprotos.a ../util/libutil.a $(protobuf_LIBS) $(libcrypto_LIBS) $(libssl_LIBS)
+mm_proxy_LDFLAGS = -pthread
 
+bin_PROGRAMS += mm-webreplay-delay
+mm_webreplay_delay_SOURCES = replay_delay_shell.cc web_server.hh web_server.cc
+mm_webreplay_delay_LDADD = -lrt ../util/libutil.a ../http/libhttp.a ../protobufs/libhttprecordprotos.a $(protobuf_LIBS)
+mm_webreplay_delay_LDFLAGS = -pthread
 
 install-exec-hook:
 	chown root $(DESTDIR)$(bindir)/mm-delay
@@ -71,3 +79,7 @@ install-exec-hook:
 	chmod u+s $(DESTDIR)$(bindir)/mm-webreplay
 	chown root $(DESTDIR)$(bindir)/mm-adv-delay
 	chmod u+s $(DESTDIR)$(bindir)/mm-adv-delay
+	chown root $(DESTDIR)$(bindir)/mm-proxy
+	chmod u+s $(DESTDIR)$(bindir)/mm-proxy
+	chown root $(DESTDIR)$(bindir)/mm-webreplay-delay
+	chmod u+s $(DESTDIR)$(bindir)/mm-webreplay-delay

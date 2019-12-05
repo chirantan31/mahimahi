@@ -24,7 +24,7 @@ WHITESPACE = re.compile(r'\s+')
 
 # RTT file name.
 # RTTs to origin/edge servers.
-RTT_FILE = "rtt.txt"
+RTT_FILE = "rtts.txt"
 
 # RTT data.
 RecRTT = namedtuple('RecRTT',
@@ -47,6 +47,8 @@ def get_link_delays(rtt, mult=1.0):
 RULEBOOK = {
     'base'                :
     lambda rtt: ld_to_str(get_link_delays(rtt)),
+    'train'                :
+    lambda rtt: ld_to_str(get_link_delays(rtt)),
     'speed'               :
     lambda rtt: ld_to_str(get_link_delays(rtt, 0.33)),
 }
@@ -55,11 +57,18 @@ RULEBOOK = {
 def srv_rtts(dir_path, domain):
     """Retrieve RTTs to origin/edge servers.
     """
+    rtts = []
     rtts_file = dir_path + "/data/" + RTT_FILE;
-    # print("#> srv: %s" % (rtts_file))
-    for (srv, port, rtt) in (line.strip().split() for line in
-                             io.open(rtts_file, 'r', encoding='utf-8')):
-        yield(RecRTT(socket.IPPROTO_TCP, srv, int(port), float(rtt)))
+    file = open(rtts_file, "r")
+    # Skip the first file
+    line = file.readline()
+    line = file.readline()
+    while (line):
+        data = line.strip().split();
+        rtt = RecRTT(socket.IPPROTO_TCP, data[0], int(data[1]), float(data[4]))
+        rtts.append(rtt)
+        line = file.readline()
+    return rtts
 
 
 def get_rtts(dir_path, domain):

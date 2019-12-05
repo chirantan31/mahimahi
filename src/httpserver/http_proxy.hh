@@ -29,6 +29,8 @@ private:
 
     template <class SocketType>
     void loop( SocketType & server, SocketType & client, HTTPBackingStore & backing_store );
+    template <class SocketType>
+    void loop( SocketType & server, SocketType & client );
 
     SSLContext server_context_, client_context_;
 
@@ -37,12 +39,17 @@ public:
 
     TCPSocket & tcp_listener( void ) { return listener_socket_; }
 
+    /* backing_store is set to NULL if you don't want to save the request-reponse */
     void handle_tcp( HTTPBackingStore & backing_store );
+    void handle_tcp( );
 
     /* register this HTTPProxy's TCP listener socket to handle events with
        the given event_loop, saving request-response pairs to the given
-       backing_store (which is captured and must continue to persist) */
+       backing_store (which is captured and must continue to persist).
+       If you don't want to save the request-record, set backing_store to NULL */
     void register_handlers( EventLoop & event_loop, HTTPBackingStore & backing_store );
+    void register_handlers( EventLoop & event_loop );
+
 };
 
 #endif /* HTTP_PROXY_HH */
