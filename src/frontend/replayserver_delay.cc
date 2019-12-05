@@ -21,6 +21,9 @@
 #include "http_response.hh"
 #include "file_descriptor.hh"
 
+#define DELAY_FILE_NAME "server-delays.txt"
+#define LOG_FILE_NAME "replayserver_log"
+
 using namespace std;
 
 /* GLOBAL VAR */
@@ -108,6 +111,48 @@ unsigned int match_score( const MahimahiProtobufs::RequestResponse & saved_recor
     return max_match;
 }
 
+vector<string> split_line(const string & line, const char delimitter) {
+    istringstream stream(line);
+    string token;
+    vector<string> result;
+    while (getline(stream, token, delimitter)) {
+        result.push_back(token);
+    }
+    return result;
+}
+
+unsigned int get_server_delay(const string & delay_path, const MahimahiProtobufs::RequestResponse & best_match) {
+    HTTPRequest request(best_match.request());
+    string first_line = request.first_line();
+    vector<string> splitted = split_line(first_line, ' ');
+    // Open delay rule file
+    // Syntax: <REQUEST TYPE> <REQUEST_LINE> <DELAY_MS>
+    // Example: GET /rsrc.php/v3/yb/r/GsNJNwuI-UM.gif   8
+    unsigned int result = 0;
+    ifstream delay_file;
+    delay_file.open(delay_path);
+    if (delay_file) {
+        string line;
+        int delay;
+        while (getline(delay_file, line)) {
+            vector<string> splitted2 = split_line(line, '\t');
+            if (splitted[0].compare(splitted2[0]) == 0 && splitted[1].compare(splitted2[1]) == 0) {
+                mylog << "Req found! " << splitted2[1] << " ,delay: " << splitted2[2] << endl;
+                delay = stoi(splitted2[2]);
+                if (delay >= 0) {
+                    result = delay;
+                } else {
+                    result = 0;
+                }
+                break;
+            }
+        }
+        delay_file.close();
+    } else {
+        throw runtime_error( "No server-delay file found! Expected path: " + delay_path );
+    }
+    return result;
+}
 int main( void )
 {
     try {
@@ -119,8 +164,11 @@ int main( void )
             + " " + safe_getenv( "REQUEST_URI" )
             + " " + safe_getenv( "SERVER_PROTOCOL" );
         const bool is_https = getenv( "HTTPS" );
+        const string delay_rule_path = recording_directory + "/../" + DELAY_FILE_NAME;
 
         SystemCall( "chdir", chdir( working_directory.c_str() ) );
+
+        mylog.open(recording_directory + "../../" + LOG_FILE_NAME, ios_base::app);
 
         const vector< string > files = list_directory_contents( recording_directory );
 
@@ -144,12 +192,17 @@ int main( void )
         }
 
         if ( best_score > 0 ) { /* give client the best match */
+            unsigned int delay = get_server_delay(delay_rule_path, best_match);
+            this_thread::sleep_for(std::chrono::milliseconds(delay));
+            mylog << "Delay: " << delay << endl;
             cout << HTTPResponse( best_match.response() ).str();
+            mylog.close();
             return EXIT_SUCCESS;
         } else {                /* no acceptable matches for request */
             cout << "HTTP/1.1 404 Not Found" << CRLF;
             cout << "Content-Type: text/plain" << CRLF << CRLF;
             cout << "replayserver: could not find a match for " << request_line << CRLF;
+            mylog.close();
             return EXIT_FAILURE;
         }
     } catch ( const exception & e ) {
@@ -157,6 +210,7 @@ int main( void )
         cout << "Content-Type: text/plain" << CRLF << CRLF;
         cout << "mahimahi mm-webreplay received an exception:" << CRLF << CRLF;
         print_exception( e, cout );
+        mylog.close();
         return EXIT_FAILURE;
     }
 }

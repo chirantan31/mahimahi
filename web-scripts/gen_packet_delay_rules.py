@@ -47,6 +47,8 @@ def get_link_delays(rtt, mult=1.0):
 RULEBOOK = {
     'base'                :
     lambda rtt: ld_to_str(get_link_delays(rtt)),
+    'train'                :
+    lambda rtt: ld_to_str(get_link_delays(rtt)),
     'speed'               :
     lambda rtt: ld_to_str(get_link_delays(rtt, 0.33)),
 }
