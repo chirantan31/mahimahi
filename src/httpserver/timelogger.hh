@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <fstream>
 #include <tuple>
+#include <mutex>
 
 using namespace std;
 using namespace std::chrono;
@@ -22,6 +23,10 @@ public:
     static unordered_map<std::string, vector<float>> rtts;
     static vector<tuple<std::string, std::string, float>> finals;
     static int testInt;
+    static std::mutex start_rtt_mutex;
+    static std::mutex stop_rtt_mutex;
+    static std::mutex start_obj_timer_mutex;
+    static std::mutex stop_obj_timer_mutex;
     
     static void test()
     {
@@ -30,6 +35,7 @@ public:
 
     static void startRttTimer(std::string addr)
     {
+        std::lock_guard<std::mutex> guard(start_rtt_mutex);
         rttStart[addr] = system_clock::now();
     }
 
@@ -37,6 +43,7 @@ public:
     {
         float value = (system_clock::now() - rttStart[addr]) / milliseconds(1);
         // cout << value << std::endl;
+        std::lock_guard<std::mutex> guard(stop_rtt_mutex);
         rtts[addr].push_back(value);
     }
 
@@ -46,6 +53,7 @@ public:
         int secondSpace = request.find(' ', firstSpace + 1);
         std::string methodType = request.substr(0, firstSpace);
         std::string requestUrl = request.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+        std::lock_guard<std::mutex> guard(start_obj_timer_mutex);
         objectLoadStart[requestUrl] = system_clock::now();
     }
 
@@ -56,6 +64,7 @@ public:
         std::string methodType = request.substr(0, firstSpace);
         std::string requestUrl = request.substr(firstSpace + 1, secondSpace - firstSpace - 1);
         float value = (system_clock::now() - objectLoadStart[requestUrl]) / milliseconds(1);
+        std::lock_guard<std::mutex> guard(stop_obj_timer_mutex);
         finals.push_back(make_tuple(methodType, requestUrl, value));
     }
 

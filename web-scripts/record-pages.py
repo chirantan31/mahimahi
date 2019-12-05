@@ -35,7 +35,7 @@ def main(args):
     success = 0
     failed = 0
     already = 0
-    
+    failed_urls = []
     for url in urls:
     	domain = urlparse(url).netloc.replace(".", "_")
     	domain_folder = out_path + "/" + domain + "/"
@@ -58,8 +58,9 @@ def main(args):
 	    		print(url + " record success")
 	    		success += 1
 	    	else:
-	    		print(url + " record failed")
-	    		failed += 1
+				failed_urls.append(url)
+				print(url + " record failed")
+				failed += 1
 
 	# Print statistics
 	print("****************")
@@ -67,6 +68,9 @@ def main(args):
 	print("FAILED: " + str(failed))
 	print("ALREADY: " + str(already))
 	print("****************")
+	print("failedUrls - ")
+	for url in failed_urls:
+		print(url)
 
 if __name__ == '__main__':
     prog = sys.argv[0]
