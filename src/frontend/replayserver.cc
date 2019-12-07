@@ -23,10 +23,6 @@
 
 using namespace std;
 
-#define LOG_FILE_NAME "replayserver_log"
-
-/* GLOBAL VAR */
-ofstream mylog;
 
 string safe_getenv( const string & key )
 {
@@ -122,9 +118,6 @@ int main( void )
             + " " + safe_getenv( "SERVER_PROTOCOL" );
         const bool is_https = getenv( "HTTPS" );
 
-        mylog.open(recording_directory + "../../" + LOG_FILE_NAME, ios_base::app);
-        mylog << "Running!!" << endl;
-
         SystemCall( "chdir", chdir( working_directory.c_str() ) );
 
         const vector< string > files = list_directory_contents( recording_directory );
@@ -150,20 +143,17 @@ int main( void )
 
         if ( best_score > 0 ) { /* give client the best match */
             cout << HTTPResponse( best_match.response() ).str();
-            mylog.close();
             return EXIT_SUCCESS;
         } else {                /* no acceptable matches for request */
             cout << "HTTP/1.1 404 Not Found" << CRLF;
             cout << "Content-Type: text/plain" << CRLF << CRLF;
             cout << "replayserver: could not find a match for " << request_line << CRLF;
-            mylog.close();
             return EXIT_FAILURE;
         }
     } catch ( const exception & e ) {
         cout << "HTTP/1.1 500 Internal Server Error" << CRLF;
         cout << "Content-Type: text/plain" << CRLF << CRLF;
         cout << "mahimahi mm-webreplay received an exception:" << CRLF << CRLF;
-        mylog.close();
         print_exception( e, cout );
         return EXIT_FAILURE;
     }

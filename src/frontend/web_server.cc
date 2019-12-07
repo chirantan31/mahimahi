@@ -34,8 +34,46 @@ WebServer::WebServer( const Address & addr, const string & working_directory, co
 
     config_file_.write( "ServerName mahimahi.\n" );
 
-    // config_file_.write( "ErrorLog /dev/null\n" );
-    config_file_.write( "ErrorLog /home/parallels/orca_server_log\n" );
+    config_file_.write( "ErrorLog /dev/null\n" );
+
+    config_file_.write( "CustomLog /dev/null common\n" );
+
+    config_file_.write( "User #" + to_string( getuid() ) + "\n" );
+
+    config_file_.write( "Group #" + to_string( getgid() ) + "\n" );
+
+    config_file_.write( "Listen " + addr.str() );
+
+    run( { APACHE2, "-f", config_file_.name(), "-k", "start" } );
+}
+
+WebServer::WebServer( const Address & addr, const string & working_directory, const string & record_path, const string & type )
+    : config_file_( "/tmp/replayshell_apache_config" ),
+      moved_away_( false )
+{
+
+    if (type.compare("delay") == 0) {
+        config_file_.write( apache_main_config_for_delay_replayserver );
+    } else {
+        config_file_.write( apache_main_config );
+    }
+
+    config_file_.write( "SetEnv MAHIMAHI_CHDIR " + working_directory + "\n" );
+    config_file_.write( "SetEnv MAHIMAHI_RECORD_PATH " + record_path + "\n" );
+
+    /* if port 443, add ssl components */
+    if ( addr.port() == 443 ) { /* ssl */
+        config_file_.write( apache_ssl_config );
+    }
+
+    /* add pid file, log files, user/group name, and listen line to config file and run apache */
+    config_file_.write( "PidFile /tmp/replayshell_apache_pid." + to_string( getpid() ) + "." + to_string( random() ) + "\n" );
+    /* Apache will check if this file exists before clobbering it,
+       so we think it's ok for Apache to write here as root */
+
+    config_file_.write( "ServerName mahimahi.\n" );
+
+    config_file_.write( "ErrorLog /dev/null\n" );
 
     config_file_.write( "CustomLog /dev/null common\n" );
 

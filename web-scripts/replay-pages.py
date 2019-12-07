@@ -15,7 +15,7 @@ import shutil
 BROWSER_WAIT_MARK = "load"
 WEB_PAGE_LOAD_SCRIPT = "web_page_load.js"
 GEN_PACKET_RULE_SCRIPT = "gen_packet_delay_rules.py"
-REPLAY_CONFIG = "test"
+REPLAY_CONFIG = "base"
 NUM_TRIALS = 1
 DEFAULT_DELAY = "0"
 REPLAYSERVER_LOG_NAME = "replayserver_log"
@@ -65,12 +65,12 @@ def main(args):
 		    	har_file = output_folder + domain + ".har"
 		    	stdout_file_path = output_folder + "mahimahi-stdout"
 		    	stdout_file = open(stdout_file_path, "w")
+		    	
 		    	# Call mahimahi and script to launch chrome
-		    	mahimahi_replay = ["mm-webreplay", record_data_folder]
+		    	mahimahi_replay = ["mm-webreplay-delay", record_data_folder]
 		    	mahimahi_delay = ["mm-adv-delay", DEFAULT_DELAY, packet_rule_fpath, traffic_fpath]
-		    	mahimahi_proxy = ["mm-proxy", output_folder]
 		    	web_page_load = ["nodejs", WEB_PAGE_LOAD_SCRIPT, url, har_file, BROWSER_WAIT_MARK]
-		    	# commands = mahimahi_replay + mahimahi_delay + mahimahi_proxy + web_page_load
+		    	
 		    	commands = mahimahi_replay + mahimahi_delay + web_page_load
 
 		    	subprocess.call(commands, stdout=stdout_file)

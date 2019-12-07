@@ -125,7 +125,8 @@ int main( int argc, char *argv[] )
         /* set up web servers */
         vector< WebServer > servers;
         for ( const auto ip_port : unique_ip_and_port ) {
-            servers.emplace_back( ip_port, working_directory, directory );
+            /* Activate web replayserver with delay */
+            servers.emplace_back( ip_port, working_directory, directory, "delay");
         }
 
         /* set up DNS server */

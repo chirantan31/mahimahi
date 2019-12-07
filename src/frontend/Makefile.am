@@ -41,6 +41,11 @@ nph_replayserver_cgi_SOURCES = replayserver.cc
 nph_replayserver_cgi_LDADD = -lrt ../util/libutil.a ../http/libhttp.a ../protobufs/libhttprecordprotos.a $(protobuf_LIBS)
 nph_replayserver_cgi_LDFLAGS = -pthread
 
+bin_PROGRAMS += nph-replayserver-delay.cgi
+nph_replayserver_delay_cgi_SOURCES = replayserver_delay.cc
+nph_replayserver_delay_cgi_LDADD = -lrt ../util/libutil.a ../http/libhttp.a ../protobufs/libhttprecordprotos.a $(protobuf_LIBS)
+nph_replayserver_delay_cgi_LDFLAGS = -pthread
+
 bin_PROGRAMS += mm-adv-delay
 mm_adv_delay_SOURCES = advdelayshell.cc adv_delay_queue.hh adv_delay_queue.cc delay_rule.hh delay_rule.cc
 mm_adv_delay_LDADD = -lrt ../util/libutil.a ../packet/libpacket.a

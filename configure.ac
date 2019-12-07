@@ -122,6 +122,12 @@ if test "${prefix}" = "NONE"; then
 fi
 AC_DEFINE_UNQUOTED([REPLAYSERVER], ["${prefix}/bin/nph-replayserver.cgi"], [path to nph-replayserver.cgi])
 
+# Set path to replayshell_delay cgi script
+if test "${prefix}" = "NONE"; then
+    prefix=$ac_default_prefix
+fi
+AC_DEFINE_UNQUOTED([REPLAYSERVER_DELAY], ["${prefix}/bin/nph-replayserver-delay.cgi"], [path to nph-replayserver-delay.cgi])
+
 # Set path to directory with installed executable programs
 AC_DEFINE_UNQUOTED([EXEC_DIR], ["${prefix}/bin/"], [path to directory with installed executable programs])
 

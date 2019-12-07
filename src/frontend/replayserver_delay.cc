@@ -1,4 +1,6 @@
 /* -*-mode:c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+/* Replayserver that simulate an artificial delay */
+/* Requires server-delay.txt, which should be located at a certain place */
 
 #include <sys/types.h>
 #include <sys/stat.h>
