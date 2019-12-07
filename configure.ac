@@ -2,13 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([mahimahi], [0.98], [mahimahi@mit.edu])
+AC_INIT([mahimahi], [0.90], [mahimahi@mit.edu])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src/frontend/delayshell.cc])
 AC_CONFIG_HEADERS([config.h])
-
-LT_INIT
-AC_CONFIG_MACRO_DIR([m4])
 
 # Add picky CXXFLAGS
 CXX11_FLAGS="-std=c++11 -pthread"
@@ -18,6 +15,7 @@ AC_SUBST([PICKY_CXXFLAGS])
 
 # Checks for programs.
 AC_PROG_CXX
+AC_PROG_RANLIB
 
 AC_ARG_VAR([IPTABLES], [path to iptables])
 AC_PATH_PROG([IPTABLES], [iptables], [no], [$PATH$PATH_SEPARATOR/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/bin])
@@ -40,6 +38,20 @@ if test "$APACHE2" = "no"; then
 fi
 AC_DEFINE_UNQUOTED([APACHE2], ["$APACHE2"], [path to apache2])
 
+AC_ARG_VAR([APACHECTL], [path to apachectl])
+AC_PATH_PROGS([APACHECTL], [apachectl], [no], [$PATH$PATH_SEPARATOR/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/bin])
+if test "$APACHECTL" = "no"; then
+  AC_MSG_ERROR([apachectl is required])
+fi
+AC_DEFINE_UNQUOTED([APACHECTL], ["$APACHECTL"], [path to apachectl])
+
+AC_ARG_VAR([SUDO], [path to sudo])
+AC_PATH_PROGS([SUDO], [sudo], [no], [$PATH$PATH_SEPARATOR/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/bin])
+if test "$SUDO" = "no"; then
+  AC_MSG_ERROR([sudo is required])
+fi
+AC_DEFINE_UNQUOTED([SUDO], ["$SUDO"], [path to sudo])
+
 AC_ARG_VAR([DNSMASQ], [path to dnsmasq])
 AC_PATH_PROG([DNSMASQ], [dnsmasq], [no], [$PATH$PATH_SEPARATOR/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/bin])
 if test "$DNSMASQ" = "no"; then
@@ -51,26 +63,50 @@ AC_PATH_PROG([PROTOC], [protoc], [])
 AS_IF([test x"$PROTOC" = x],
   [AC_MSG_ERROR([cannot find protoc, the Protocol Buffers compiler])])
 
-AC_PATH_PROG([APXS], [apxs], [])
-AS_IF([test x"$APXS" = x],
-  [AC_MSG_ERROR([cannot find apxs, the Apache extension tool])])
-
-AC_SUBST([APACHE2_MODULE_DIR], [$(apxs -q exp_libexecdir)])
-AC_SUBST([APACHE2_INCLUDE], [$(apxs -q exp_includedir)])
+AC_CHECK_FILE([/usr/lib/apache2], [APACHE_NAME="apache2"],
+  [AC_CHECK_FILE([/usr/lib/httpd], [APACHE_NAME="httpd"],
+    [AC_MSG_ERROR([apache module directory not found])])])
 
 # Checks for apache configuration modules
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_dir.so], [],
+              [AC_MSG_ERROR([apache2 mod_dir.so is required])])
 
-AC_CHECK_FILE([$APACHE2_MODULE_DIR/mod_mpm_prefork.so],
-	      [AC_DEFINE_UNQUOTED([MOD_MPM_PREFORK], ["$APACHE2_MODULE_DIR/mod_mpm_prefork.so"], [mod_prefork.so])],
+AC_DEFINE_UNQUOTED([MOD_DIR], ["/usr/lib/$APACHE_NAME/modules/mod_dir.so"], [path to apache2 mod_dir])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_mpm_prefork.so], [],
               [AC_MSG_ERROR([apache2 mod_mpm_prefork.so is required])])
 
-AC_CHECK_FILE([$APACHE2_MODULE_DIR/mod_authz_core.so],
-	      [AC_DEFINE_UNQUOTED([MOD_AUTHZ_CORE], ["$APACHE2_MODULE_DIR/mod_authz_core.so"], [mod_authz_core.so])],
+AC_DEFINE_UNQUOTED([MOD_MPM_PREFORK], ["/usr/lib/$APACHE_NAME/modules/mod_mpm_prefork.so"], [path to apache2 mod_mpm_prefork])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_mime.so], [],
+              [AC_MSG_ERROR([apache2 mod_mime.so is required])])
+
+AC_DEFINE_UNQUOTED([MOD_MIME], ["/usr/lib/$APACHE_NAME/modules/mod_mime.so"], [path to apache2 mod_mime])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_authz_core.so], [],
               [AC_MSG_ERROR([apache2 mod_authz_core.so is required])])
 
-AC_CHECK_FILE([$APACHE2_MODULE_DIR/mod_ssl.so],
-	      [AC_DEFINE_UNQUOTED([MOD_SSL], ["$APACHE2_MODULE_DIR/mod_ssl.so"], [mod_ssl.so])],
+AC_DEFINE_UNQUOTED([MOD_AUTHZ_CORE], ["/usr/lib/$APACHE_NAME/modules/mod_authz_core.so"], [path to apache2 mod_authz_core])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_cgi.so], [],
+              [AC_MSG_ERROR([apache2 mod_cgi.so is required])])
+
+AC_DEFINE_UNQUOTED([MOD_CGI], ["/usr/lib/$APACHE_NAME/modules/mod_cgi.so"], [path to apache2 mod_cgi])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_rewrite.so], [],
+              [AC_MSG_ERROR([apache2 mod_rewrite.so is required])])
+
+AC_DEFINE_UNQUOTED([MOD_REWRITE], ["/usr/lib/$APACHE_NAME/modules/mod_rewrite.so"], [path to apache2 mod_rewrite])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_env.so], [],
+	      [AC_MSG_ERROR([apache2 mod_env.so is required])])
+
+AC_DEFINE_UNQUOTED([MOD_ENV], ["/usr/lib/$APACHE_NAME/modules/mod_env.so"], [path to apache2 mod_env])
+
+AC_CHECK_FILE([/usr/lib/$APACHE_NAME/modules/mod_ssl.so], [],
               [AC_MSG_ERROR([apache2 mod_ssl.so is required])])
+
+AC_DEFINE_UNQUOTED([MOD_SSL], ["/usr/lib/$APACHE_NAME/modules/mod_ssl.so"], [path to apache2 mod_ssl])
 
 # Checks for SSL certificate file
 AC_CHECK_FILE([/etc/ssl/certs/ssl-cert-snakeoil.pem], [],
@@ -80,25 +116,22 @@ AC_DEFINE_UNQUOTED([MOD_SSL_CERTIFICATE_FILE], ["/etc/ssl/certs/ssl-cert-snakeoi
 
 AC_DEFINE_UNQUOTED([MOD_SSL_KEY], ["/etc/ssl/private/ssl-cert-snakeoil.key"], [path to ssl key])
 
-# Set path to mm-replayserver script
+# Set path to replayshell cgi script
 if test "${prefix}" = "NONE"; then
     prefix=$ac_default_prefix
 fi
-AC_DEFINE_UNQUOTED([REPLAYSERVER], ["${prefix}/bin/mm-replayserver"], [path to mm-replayserver])
+AC_DEFINE_UNQUOTED([REPLAYSERVER], ["${prefix}/bin/nph-replayserver.cgi"], [path to nph-replayserver.cgi])
 
-AC_DEFINE_UNQUOTED([MOD_DEEPCGI], ["${prefix}/lib/${DEB_HOST_MULTIARCH}/libmod_deepcgi.so"], [path to apache2 mod_deepcgi])
+# Set path to directory with installed executable programs
+AC_DEFINE_UNQUOTED([EXEC_DIR], ["${prefix}/bin/"], [path to directory with installed executable programs])
 
 # Checks for libraries.
 PKG_CHECK_MODULES([protobuf], [protobuf])
 PKG_CHECK_MODULES([libssl], [libcrypto libssl])
-PKG_CHECK_MODULES([libapr1], [apr-1])
-PKG_CHECK_MODULES([XCB], [xcb])
-PKG_CHECK_MODULES([XCBPRESENT], [xcb-present])
-PKG_CHECK_MODULES([PANGOCAIRO], [pangocairo])
 
 # Checks for header files.
 AC_HEADER_RESOLV
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h paths.h sys/ioctl.h sys/socket.h unistd.h], [], [AC_MSG_ERROR([Missing required header file.])])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h paths.h sys/ioctl.h sys/socket.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -114,6 +147,8 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([clock_gettime inet_ntoa memset mkdir setenv socket strerror strtol])
+PKG_CHECK_MODULES([XCBPRESENT], [xcb-present])
+PKG_CHECK_MODULES([PANGOCAIRO], [pangocairo])
 
 AC_CONFIG_FILES([Makefile
 		 src/Makefile

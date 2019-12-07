@@ -15,7 +15,7 @@ import shutil
 BROWSER_WAIT_MARK = "load"
 WEB_PAGE_LOAD_SCRIPT = "web_page_load.js"
 GEN_PACKET_RULE_SCRIPT = "gen_packet_delay_rules.py"
-REPLAY_CONFIG = "base"
+REPLAY_CONFIG = "test"
 NUM_TRIALS = 1
 DEFAULT_DELAY = "0"
 REPLAYSERVER_LOG_NAME = "replayserver_log"
@@ -56,8 +56,8 @@ def main(args):
 		    	os.mkdir(output_folder)
 		    	os.mkdir(traffic_folder)
 
-		    	# if (os.path.exists(log_folder + REPLAYSERVER_LOG_NAME)):
-		    	# 	shutil.rm(log_folder + REPLAYSERVER_LOG_NAME)
+		    	if (os.path.exists(log_folder + REPLAYSERVER_LOG_NAME)):
+		    		shutil.rm(log_folder + REPLAYSERVER_LOG_NAME)
 
 		    	# Generate delay rule file
 		    	gen_rule = ["python", GEN_PACKET_RULE_SCRIPT, url, record_folder, REPLAY_CONFIG, packet_rule_fpath]
@@ -79,7 +79,6 @@ def main(args):
 		    	# Move replayserver log file
 		    	print(log_folder + REPLAYSERVER_LOG_NAME)
 		    	if (os.path.exists(log_folder + REPLAYSERVER_LOG_NAME)):
-		    		print("Move the replayserver_log")
 		    		shutil.move(log_folder + REPLAYSERVER_LOG_NAME, output_folder + REPLAYSERVER_LOG_NAME)
 
 		    	# Check whether recording success by finding the har file

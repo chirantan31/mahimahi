@@ -125,6 +125,7 @@ int main( int argc, char *argv[] )
         /* set up web servers */
         vector< WebServer > servers;
         for ( const auto ip_port : unique_ip_and_port ) {
+            cout << "IP: " << ip_port.ip() << " has started!" << endl;
             servers.emplace_back( ip_port, working_directory, directory );
         }
 
