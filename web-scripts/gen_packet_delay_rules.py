@@ -47,12 +47,18 @@ def get_link_delays(rtt, mult=1.0):
 RULEBOOK = {
     'base'                :
     lambda rtt: ld_to_str(get_link_delays(rtt)),
-    'test'                :
+    'without-delay'                :
+    lambda rtt: ld_to_str(get_link_delays(rtt, 0)),
+    'network-delay'                :
+    lambda rtt: ld_to_str(get_link_delays(rtt)),
+    'base'                :
+    lambda rtt: ld_to_str(get_link_delays(rtt)),
+    'base-network-0.33'                :
+    lambda rtt: ld_to_str(get_link_delays(rtt, 0.33)),
+    'base-server-0.5'                :
     lambda rtt: ld_to_str(get_link_delays(rtt)),
     'train'                :
     lambda rtt: ld_to_str(get_link_delays(rtt)),
-    'speed'               :
-    lambda rtt: ld_to_str(get_link_delays(rtt, 0.33)),
 }
 
 
